@@ -1,78 +1,152 @@
-# 30 Days DevOps Challenge - Weather Dashboard
+# Weather Dashboard Project
 
-Day 1: Building a weather data collection system using AWS S3 and OpenWeather API
+A DevOps solution for BTL, a small business that organizes events and requires real-time weather information for operational decision-making. This project creates an automated system that fetches weather data and displays it on a public dashboard using AWS S3 static website hosting.
 
-# Weather Data Collection System - DevOps Day 1 Challenge
+## Problem Statement
 
-## Project Overview
-This project is a Weather Data Collection System that demonstrates core DevOps principles by combining:
-- External API Integration (OpenWeather API)
-- Cloud Storage (AWS S3)
-- Infrastructure as Code
-- Version Control (Git)
-- Python Development
-- Error Handling
-- Environment Management
+BTL needs a real-time weather dashboard integrated into their event booking page to help customers make informed decisions. As a small business without technical expertise, they require a low-maintenance, cost-effective solution that:
+- Fetches weather data from a reliable source
+- Processes it into a visually appealing format
+- Hosts it on a scalable platform
+- Provides easy public access
 
-## Features
-- Fetches real-time weather data for multiple cities
-- Displays temperature (°F), humidity, and weather conditions
-- Automatically stores weather data in AWS S3
-- Supports multiple cities tracking
-- Timestamps all data for historical tracking
+## Solution Architecture
 
-## Technical Architecture
-- **Language:** Python 3.x
-- **Cloud Provider:** AWS (S3)
-- **External API:** OpenWeather API
-- **Dependencies:** 
-  - boto3 (AWS SDK)
-  - python-dotenv
-  - requests
+The project implements two main components:
+1. JSON data storage pipeline for analytics
+2. Dynamic HTML dashboard for public display
 
-```markdown
-## Project Structure
-weather-dashboard/
-  src/
-    __init__.py
-    weather_dashboard.py
-  tests/
-  data/
-  .env
-  .gitignore
-  requirements.txt
+### Tech Stack
 
-## Setup Instructions
-1. Clone the repository:
---bash
-git clone https://github.com/ShaeInTheCloud/30days-weather-dashboard.git
+- **Data Source**: OpenWeatherMap API
+- **Programming Language**: Python
+- **Cloud Platform**: AWS S3
+- **Development Environment**: 
+  - Vagrant (VM)
+  - VS Code
+- **Key Libraries**:
+  - Requests: API integration
+  - Boto3: AWS S3 interaction
+  - Jinja2: HTML templating
+  - python-dotenv: Environment management
 
-3. Install dependencies:
-bashCopypip install -r requirements.txt
+## Prerequisites
 
-4. Configure environment variables (.env):
-CopyOPENWEATHER_API_KEY=your_api_key
-AWS_BUCKET_NAME=your_bucket_name
+- Vagrant and VirtualBox (Optional)
+- Visual Studio Code
+- AWS Account
+- Python 3
+- AWS CLI
 
-4.Configure AWS credentials:
-bashCopyaws configure
+## Project Setup
 
-5. Run the application:
-python src/weather_dashboard.py
+### 1. Virtual Machine Setup (Optional)
 
-What I Learned
+```bash
+# Initialize Vagrant
+vagrant init hashicorp/bionic64
+vagrant up
+```
 
-AWS S3 bucket creation and management
-Environment variable management for secure API keys
-Python best practices for API integration
-Git workflow for project development
-Error handling in distributed systems
-Cloud resource management
+### 2. Project Structure
 
-Future Enhancements
+```bash
+mkdir -p weather_dashboard/{src,data,tests,templates}
+cd weather_dashboard
+```
 
-Add weather forecasting
-Implement data visualization
-Add more cities
-Create automated testing
-Set up CI/CD pipeline
+### 3. Dependencies Installation
+
+```bash
+# Update system and install Python
+sudo apt update && sudo apt install -y python3-pip python3-venv
+
+# Create and activate virtual environment
+python3 -m venv venv
+source venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+### 4. AWS CLI Configuration
+
+```bash
+# Install AWS CLI
+sudo apt install -y awscli
+
+# Configure AWS credentials
+aws configure
+```
+
+### 5. Environment Setup
+
+Create a `.env` file with the following parameters:
+```
+OPENWEATHERMAP_API_KEY=your_openweathermap_api_key
+JSON_BUCKET_NAME=your_s3_bucket_for_json
+HTML_BUCKET_NAME=your_s3_bucket_for_html
+```
+
+Add `.env` to `.gitignore`:
+```bash
+echo ".env" >> .gitignore
+```
+
+## Running the Application
+
+### JSON Weather Data Pipeline
+
+```bash
+python3 src/json_weather_dashboard.py
+```
+
+### HTML Weather Dashboard
+
+```bash
+python3 src/web_weather_dashboard.py
+```
+
+## Deployment
+
+1. Configure S3 Bucket for Static Website Hosting:
+   - Navigate to your S3 bucket in AWS Console
+   - Enable Static website hosting under Properties
+   - Uncheck "Block all public access"
+   - Add bucket policy for public read access:
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "PublicReadGetObject",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::your-bucket-name/*"
+        }
+    ]
+}
+```
+
+2. Access the dashboard at: `http://your_html_bucket.s3-website-us-east-1.amazonaws.com`
+
+## Challenges and Solutions
+
+1. **S3 Bucket Creation Error**: Fixed by implementing proper bucket name validation
+2. **API Authorization**: Resolved unauthorized access issues by validating API key presence
+3. **Missing Dependencies**: Addressed by properly managing virtual environment and requirements
+4. **PATH Issues**: Fixed pip-related PATH problems by updating environment variables
+
+## Live Demo
+
+Access the live weather dashboard: [http://web-jarvis-weather.s3-website.us-east-2.amazonaws.com/](http://web-jarvis-weather.s3-website.us-east-2.amazonaws.com/)
+
+## Contributing
+
+Feel free to fork this repository and submit pull requests with improvements.
+
+## License
+
+This project is open source and available under the [MIT License](LICENSE).
